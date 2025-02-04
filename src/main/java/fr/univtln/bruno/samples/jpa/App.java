@@ -1,10 +1,12 @@
 package fr.univtln.bruno.samples.jpa;
 
+import fr.univtln.bruno.samples.jpa.model.documents.AuthorDTO;
 import fr.univtln.bruno.samples.jpa.model.documents.Author;
 import fr.univtln.bruno.samples.jpa.model.utils.DataGenerator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.h2.tools.Server;
 
@@ -93,14 +95,24 @@ public class App {
     }
 
     // Perform basic JPA queries
+    // try (EntityManager entityManager = getEntityManagerFactory().createEntityManager()) {
+    //   entityManager.createQuery("select a from Author a", Author.class)
+    //     .setFirstResult(0)
+    //     .setMaxResults(10)
+    //     .getResultStream()
+    //     .map(Object::toString)
+    //     .forEach(log::info);
+    // }
     try (EntityManager entityManager = getEntityManagerFactory().createEntityManager()) {
-      entityManager.createQuery("select a from Author a", Author.class)
-        .setFirstResult(0)
-        .setMaxResults(10)
+      TypedQuery<AuthorDTO> query =  entityManager.createQuery("select new fr.univtln.bruno.samples.jpa.model.documents.AuthorDTO (a.id, a.name) from Author a", AuthorDTO.class);
+      query
+      .setFirstResult(0)
+        .setMaxResults(100)
         .getResultStream()
         .map(Object::toString)
         .forEach(log::info);
     }
+
   }
 
   private static final class DatabaseConfig {
