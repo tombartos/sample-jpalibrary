@@ -1,6 +1,8 @@
 package fr.univtln.bruno.samples.jpa;
 
+import fr.univtln.bruno.samples.jpa.model.repositories.*;
 import fr.univtln.bruno.samples.jpa.model.documents.AuthorDTO;
+import fr.univtln.bruno.samples.jpa.model.documents.Address;
 import fr.univtln.bruno.samples.jpa.model.documents.Author;
 import fr.univtln.bruno.samples.jpa.model.utils.DataGenerator;
 import jakarta.persistence.EntityManager;
@@ -9,6 +11,8 @@ import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.h2.tools.Server;
+
+import ch.qos.logback.classic.pattern.SyslogStartConverter;
 
 import java.sql.SQLException;
 
@@ -103,15 +107,44 @@ public class App {
     //     .map(Object::toString)
     //     .forEach(log::info);
     // }
-    try (EntityManager entityManager = getEntityManagerFactory().createEntityManager()) {
-      TypedQuery<AuthorDTO> query =  entityManager.createQuery("select new fr.univtln.bruno.samples.jpa.model.documents.AuthorDTO (a.id, a.name) from Author a", AuthorDTO.class);
-      query
-      .setFirstResult(0)
-        .setMaxResults(100)
-        .getResultStream()
-        .map(Object::toString)
-        .forEach(log::info);
+    // try (EntityManager entityManager = getEntityManagerFactory().createEntityManager()) {
+    //   TypedQuery<AuthorDTO> query =  entityManager.createQuery("select new fr.univtln.bruno.samples.jpa.model.documents.AuthorDTO (a.id, a.name) from Author a", AuthorDTO.class);
+    //   query
+    //   .setFirstResult(0)
+    //     .setMaxResults(100)
+    //     .getResultStream()
+    //     .map(Object::toString)
+    //     .forEach(log::info);
+    // }
+
+    // try (EntityManager entityManager = getEntityManagerFactory().createEntityManager()){
+    //   Long query = entityManager.createNamedQuery("Author.getDocNumber", Long.class)
+    //                .setParameter("authorId", 1)
+    //                .getSingleResult();
+    //   System.out.println(query);
+                   
+    // }
+    Address address = Address.builder()
+                .street("123 Main St")
+                .city("Sample City")
+                .country("Sample Country")
+                .build();
+
+    Author author = Author.builder()
+            .name("John Doe")
+            .address(address)
+            .build();
+    try(EntityManager entityManager = getEntityManagerFactory().createEntityManager()){
+      AuthorRepository authorRepository = new AuthorRepository(entityManager);
+      authorRepository.save(author);
+      log.info("success");
+      authorRepository.getAuthorsByDocNb(0, 0, 10)
+                      .ifPresent(query -> query.getResultStream()
+                      .map(Object::toString)
+                      .forEach(log::info));
     }
+
+    
 
   }
 

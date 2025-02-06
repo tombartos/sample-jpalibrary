@@ -21,6 +21,13 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString(onlyExplicitlyIncluded = true)
+
+@NamedQueries({
+  @NamedQuery(
+    name = "Author.getDocNumber",
+    query = "SELECT COUNT(d) FROM Document d JOIN d.authors a WHERE a.id = :authorId"
+  )
+})
 public class Author {
   /**
    * The unique identifier for the Author entity.
