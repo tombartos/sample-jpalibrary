@@ -10,7 +10,6 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
-import org.h2.tools.Server;
 
 import ch.qos.logback.classic.pattern.SyslogStartConverter;
 
@@ -34,44 +33,24 @@ public class App {
 
   private static final EntityManagerFactory emf;
 
-  private static final Server h2Server;
-  private static final Server webServer;
 
   static {
-    Server tryH2Server = null;
-    Server tryWebServer = null;
     EntityManagerFactory tryEmf = null;
 
     try {
-      // Start H2 database server
-      tryH2Server = Server.createTcpServer(DatabaseConfig.DB_ARGS_TCP).start();
-      log.info("H2 database server started and connection is open.");
-      log.info("URL (h2): {}", tryH2Server.getURL());
-
-      // Start H2 web server
-      tryWebServer = Server.createWebServer(DatabaseConfig.DB_ARGS_WEB).start();
-      log.info("URL (web): {}", tryWebServer.getURL());
-
       // Create EntityManagerFactory
       tryEmf = Persistence.createEntityManagerFactory(DatabaseConfig.PERSISTENCE_UNIT);
 
-    } catch (SQLException e) {
-      log.error("Failed to start H2 database server.", e);
+    } catch (Exception e) {
+      log.error("Failed to create EntityManagerFactory", e);
       System.exit(0);
     }
-
-    h2Server = tryH2Server;
-    webServer = tryWebServer;
     emf = tryEmf;
 
     // Stop the H2 database server on shutdown
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       emf.close();
       log.info("EMF closed");
-
-      h2Server.stop();
-      webServer.stop();
-      log.info("H2 database server stopped.");
     }));
   }
 
