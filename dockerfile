@@ -1,0 +1,31 @@
+# Multi-stage build for Java application
+# Stage 1: Build environment
+FROM maven:3.9.6-eclipse-temurin-21-jammy AS stage-build
+WORKDIR /app
+
+# Copy POM first to leverage Docker cache for dependencies
+COPY pom.xml ./
+RUN mvn dependency:resolve
+
+# Copy source code and build the application
+COPY src ./src
+RUN mvn clean verify
+
+# Stage 2: Runtime environment
+FROM eclipse-temurin:21-jre-jammy
+LABEL maintainer="Tom BARTIER <tom-bartier@etud.univ-tln.fr>"
+LABEL description="Java JPA Discovery Application - multi-stage"
+
+# Copy only the built jar from the build stage
+COPY --from=stage-build /app/target/*-jar-with-dependencies.jar /myapp.jar
+
+# Create a non-root user for security
+RUN useradd -r -u 1001 -g root appuser
+USER appuser
+
+# Configure Java options for container environment
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+
+# Run the application
+ENTRYPOINT ["java", "-jar"]
+CMD ["/myapp.jar"]

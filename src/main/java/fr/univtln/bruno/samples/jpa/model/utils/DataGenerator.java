@@ -83,7 +83,7 @@ public class DataGenerator implements AutoCloseable {
    * @return a list of random authors
    */
   public List<Author> getRandomAuthors(int n) {
-    TypedQuery<Author> query = entityManager.createQuery("SELECT a FROM Author a ORDER BY FUNCTION('RAND')",
+    TypedQuery<Author> query = entityManager.createQuery("SELECT a FROM Author a ORDER BY FUNCTION('RANDOM')",
       Author.class);
     query.setMaxResults(n);
     return query.getResultList();
@@ -112,7 +112,7 @@ public class DataGenerator implements AutoCloseable {
    */
   public Optional<Book> getRandomFreeBook(LocalDate date) {
     TypedQuery<Book> query = entityManager.createQuery(
-      "SELECT b FROM Book b WHERE b.id NOT IN (SELECT l.document.id FROM Loan l WHERE l.returnDate IS NULL OR l.dueDate > :date) ORDER BY FUNCTION('RAND')",
+      "SELECT b FROM Book b WHERE b.id NOT IN (SELECT l.document.id FROM Loan l WHERE l.returnDate IS NULL OR l.dueDate > :date) ORDER BY FUNCTION('RANDOM')",
       Book.class);
     query.setParameter("date", date);
     query.setMaxResults(1);
@@ -205,7 +205,7 @@ public class DataGenerator implements AutoCloseable {
    * @return a random User instance
    */
   private User getRandomUser() {
-    TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u ORDER BY FUNCTION('RAND')", User.class);
+    TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u ORDER BY FUNCTION('RANDOM')", User.class);
     query.setMaxResults(1);
     return query.getSingleResult();
   }

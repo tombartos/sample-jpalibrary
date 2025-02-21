@@ -10,7 +10,7 @@
       <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver" />
       <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:8080/postgres" />
       <property name="jakarta.persistence.jdbc.user" value="postgres" />
-      <property name="jakarta.persistence.jdbc.password" value="secret" />
+      <property name="jakarta.persistence.jdbc.password" value="mysecretpassword" />
 
       <!-- Database creation: none, create, drop-and-create, drop -->
       <property name="jakarta.persistence.schema-generation.database.action"
